@@ -1,0 +1,43 @@
+name: Metrics
+on:
+  # Met à jour l'image toutes les 24 heures
+  schedule: [{cron: "0 0 * * *"}]
+  # Permet de lancer la mise à jour manuellement depuis l'onglet Actions
+  workflow_dispatch:
+  # Met à jour l'image à chaque fois que tu modifies ton code
+  push: {branches: ["master", "main"]}
+
+jobs:
+  github-metrics:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: lowlighter/metrics@latest
+        with:
+          # Ton token GitHub
+          token: ${{ secrets.METRICS_TOKEN }}
+
+          # Options globales
+          user: Drac1283  # REMPLACE CECI PAR TON PSEUDO
+          template: classic
+          base: header, activity, community, repositories, metadata
+          config_timezone: Europe/Paris # Adapte à ton fuseau horaire
+
+          # Plugin 1 : Le calendrier isométrique 3D
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: full-year
+
+          # Plugin 2 : Les statistiques WakaTime (Heures, langages, OS, Editeurs)
+          plugin_wakatime: yes
+          plugin_wakatime_token: ${{ secrets.WAKATIME_API_KEY }}
+          plugin_wakatime_days: 365
+          plugin_wakatime_sections: time, projects, projects-graphs, languages, languages-graphs, editors, os
+          plugin_wakatime_limit: 5
+
+          # Plugin 3 : Les "streaks" (Jours consécutifs de code)
+          plugin_habits: yes
+          plugin_habits_from: 200
+          plugin_habits_days: 14
+          plugin_habits_facts: yes
+          plugin_habits_charts: yes
